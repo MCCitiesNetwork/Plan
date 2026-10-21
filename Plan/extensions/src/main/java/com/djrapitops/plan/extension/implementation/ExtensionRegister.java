@@ -112,7 +112,7 @@ public class ExtensionRegister {
         register(new DKBansExtensionFactory(), DKBansExtensionFactory::createExtension, DKBansExtensionFactory::registerListener);
         register(new DKCoinsExtensionFactory(), DKCoinsExtensionFactory::createExtension, DKCoinsExtensionFactory::registerListener);
         register(new EssentialsExtensionFactory(), EssentialsExtensionFactory::createExtension, EssentialsExtensionFactory::registerUpdateListeners);
-        register(new EssentialsExtensionFactory(), EssentialsExtensionFactory::createEcoExtension, EssentialsExtensionFactory::registerEconomyUpdateListeners);
+        registerEssentialsEconomyExtension();
         register(new CMIExtensionFactory(), CMIExtensionFactory::createCMIExtension, CMIExtensionFactory::registerCMIUpdateListeners);
         register(new FactionsExtensionFactory(), FactionsExtensionFactory::createExtension);
         register(new FactionsUUIDExtensionFactory(), FactionsUUIDExtensionFactory::createExtension, FactionsUUIDExtensionFactory::registerExpansion);
@@ -149,6 +149,18 @@ public class ExtensionRegister {
         register(new ViaVersionExtensionFactory(), ViaVersionExtensionFactory::createExtension, ViaVersionExtensionFactory::registerListener);
 
         if (registerException != null) throw registerException;
+    }
+
+    void registerEssentialsEconomyExtension() {
+        // The normal disabled-extension check runs after factory construction.
+        // Economy APIs are optional even when the Essentials core is installed.
+        if (disabledExtensions.contains("EssentialsEco")
+                || !isExtensionEnabledInConfig.test("EssentialsEco")
+                || !EssentialsEconomyAvailability.isAvailable(EssentialsExtensionFactory.class.getClassLoader())) {
+            return;
+        }
+        register(new EssentialsExtensionFactory(), EssentialsExtensionFactory::createEcoExtension,
+                EssentialsExtensionFactory::registerEconomyUpdateListeners);
     }
 
     private void registerBentoBoxExtensions() {
